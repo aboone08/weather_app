@@ -22,5 +22,5 @@ function weather(req, res){
 }
 
 function listenCallback(){
-  console.log('Now listening on port 8080' + server.get('port'));
+  console.log('Now listening on port' + server.get('port'));
 }
