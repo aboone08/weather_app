@@ -1,31 +1,59 @@
     var weatherData = {};
+    var googleData = {};
+
   $(document).ready(function(){
-    var google = 'https://www.googleapis.com/geolocation/';
     var baseUrl = 'https://api.forecast.io/forecast/';
-    var name = "Your Name";
+    var locationUrl= 'https://maps.googleapis.com/maps/api/geocode/json?address=';
 
-    $('#get-weather').on('click', showInfo);
+    $('#get-weather').on('click', google);
 
-    function google (city, state){
-      return location + geoApiKey+'/'+city+','+state;
-    }
+    function googleUrl (location){
+      return locationUrl + location;
+    };
 
-    function buildUrl (lat, lon){
-      return baseUrl + apiKey+'/'+lat+','+lon;
-    }
+    function google(){
+      var location = $('#location').val();
+      console.log(location);
+      var jsonGoogle = {
+        url: googleUrl(location),
+        success: googleSuccess,
+        error: errorHandler
+      };
+      $.ajax(jsonGoogle);
+      console.log(location);
+    };
 
-    function getWeather(){
-      var lat = $('#latitude').val();
-      var lon = $('#longitude').val();
-      var options = {
-        url: buildUrl(lat, lon),
+    function googleSuccess(google){
+      console.log(google);
+      var lat = google.results[0].geometry.location.lat;
+      var lon = google.results[0].geometry.location.lng;
+      var ajaxOptions = {
+        url: buildUrl(lat,lon),
         dataType: 'jsonp',
-        success: successHandler,
+        success: showInfoSuccess,
         error: errorHandler
       };
 
-      $.ajax(options);
+      $.ajax(ajaxOptions);
+
     }
+
+    function buildUrl(lat, lon){
+      return baseUrl + apiKey+'/'+lat+','+lon;
+    };
+
+    // function getWeather(){
+    //   var lat = $('#latitude').val();
+    //   var lon = $('#longitude').val();
+    //   var options = {
+    //     url: buildUrl(lat, lon),
+    //     dataType: 'jsonp',
+    //     success: successHandler,
+    //     error: errorHandler
+    //   };
+    //
+    //   $.ajax(options);
+    // }
 
     function successHandler(data){
       weatherData = data;
@@ -38,9 +66,9 @@
       console.log(err);
     }
 
-    function showInfo(){
-      var lat = $('#latitude').val();
-      var lon = $('#longitude'.val();
+    function showInfo(lat, lon){
+      // var lat = $('#latitude').val();
+      // var lon = $('#longitude'.val();
       var ajaxOptions = {
         url: buildUrl(lat,lon),
         dataType: 'jsonp',
@@ -55,15 +83,17 @@
       console.log(data);
       var source = $('#info').html();
       var template = Handlebars.compile(source);
+      var w = data.currently;
       var extractedData = {
-        latitude: data.latitude,
-        longitude: data.longitude,
-        icon: data.currently.icon,
-        summary: data.currently.summary,
-        time: data.currently.time
+        temperature: w.temperature,
+        feels_like: w.apparentTemperature,
+        icon: w.icon || 'clear-day',
+        summary: w.summary,
+        humidity: w.humidity,
+
       };
       var html = template(extractedData);
-      $('#tes-output').html(html);
+      $('#output').html(html);
     }
 
   });

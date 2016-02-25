@@ -1,3 +1,10 @@
-carousel {
-  position: absolute;
+body{
+  position: center;
+  background-color: #F4A261;
+}
+
+h2 {
+  text-align: : center;
+  color: #2a9d8f;
+  font-weight: bold;
 }
